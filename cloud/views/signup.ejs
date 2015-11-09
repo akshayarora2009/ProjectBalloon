@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Balloon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/css/config.css"/>
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+    <script type="text/javascript">
+        Parse.initialize("DRQHjppq9UodUweC4dwFn4cwpToO1hMEzSAERsSR", "kfIQcoAcQYzZQrIsUNQV4Jv9WA2cxUyiD9ebaX8s");
+    </script>
+    <script>
+        if(window.location.protocol == "http:")
+        {
+            window.location.href = "https://upnext.parseapp.com/begin";
+        }
+
+    </script>
+
+    <script src="/js/begin.js" ></script>
+
+</head>
+<body id="my-doc">
+
+<div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--2-col"></div>
+
+    <div class="mdl-cell mdl-cell--8-col" >
+        <div class="mdl-grid" id="mount-here">
+            <div class="mdl-cell mdl-cell--3-col"></div>
+            <div class="mdl-cell mdl-cell--5-col" >
+
+                <div><%= message %></div>
+                <div id="form-message"></div>
+                <form action="/begin/signup" method="post" onsubmit="return handleSubmit();">
+                    <div style="width:100%" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ">
+                        <input class="mdl-textfield__input " type="email" name="username" id="username"/>
+                        <label class="mdl-textfield__label " id="label-username" for="username">email</label>
+                    </div>
+                    <div style="width:100%" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ">
+                        <input class="mdl-textfield__input " name="password" type="password" id="password"/>
+                        <label class="mdl-textfield__label" id="label-password" for="password">Password</label>
+                    </div>
+                    <div style="width:100%" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ">
+                        <input class="mdl-textfield__input " name="confirm-password" type="password" id="confirm-password"/>
+                        <label class="mdl-textfield__label" id="label-confirm-password" for="confirm-password">Confirm Password</label>
+                    </div>
+                    <div>
+                        <input type="submit" value="Create my Account" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent make-block"/>
+                    </div>
+                </form>
+
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+<script>
+
+    function handleSubmit(){
+
+        var pass = $('#password').val();
+        var confpass = $('#confirm-password').val();
+
+        if(pass.length == 0 || confpass.length == 0 || pass !== confpass)
+        {
+            $('#form-message').text('Passwords do not match');
+            return false;
+        }
+        return true;
+
+    }
+
+
+
+</script>
+
+
+</body>
+</html>

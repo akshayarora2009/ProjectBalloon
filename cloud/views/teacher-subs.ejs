@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subscriptions - Balloon</title>
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!-- Bootstrap Modal -->
+    <link rel="stylesheet" href="/bootstrap-modals/bootstrap.css"/>
+    <script src="/bootstrap-modals/bootstrap.js"></script>
+
+    <link rel="stylesheet" href="/css/config.css"/>
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <link rel="stylesheet" href="/css/mdl-dash.css"/>
+
+
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+    <script type="text/javascript">
+        Parse.initialize("XH75pcgt3aNDaWpZZO8auvda5aAmq9vfqFHgj0Et", "RetUyiG1raywkGL40dISTg6KK6ECJXdzy9iBGMS9");
+    </script>
+
+</head>
+<body style="overflow-y: scroll">
+
+<!-- Always shows a header, even in smaller screens. -->
+
+<% include templates/teacher-header.ejs %>
+            <!-- Your content goes here -->
+
+            <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                <div class="mdl-tabs__tab-bar">
+                    <a href="#requests-panel" class="mdl-tabs__tab is-active">Subscription Requests</a>
+
+                </div>
+
+                <div class="mdl-tabs__panel is-active" id="requests-panel">
+                    <table class="mdl-data-table mdl-js-data-table">
+                        <thead>
+                        <tr>
+                            <td>Name</td>
+                            <td>SID</td>
+                            <td>Branch</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <% for(var i=0; i < req_data.length; ++i) { %>
+                        <tr>
+
+                        <td><%= req_data[i].get("sub_by").attributes.first_name %> <%= req_data[i].get("sub_by").attributes.last_name %></td>
+                        <td><%= req_data[i].get("sub_by").attributes.sid %></td>
+                        <td><%= req_data[i].get("sub_by").attributes.branch %></td>
+                        <td><button objectId="<%= req_data[i].id %>" class="mdl-button mdl-js-button mdl-button--accent accept">Accept</button></td>
+                        <td><button objectId="<%= req_data[i].id %>" class="mdl-button mdl-js-button mdl-button--colored reject">Reject</button></td>
+
+                        <% } %>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+
+
+
+
+
+<% include templates/teacher-footer.ejs %>
+
+<!-- TODO: Bootstrap Modal -->
+
+<div class="modal fade" id="select-group-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Select a group</h4>
+            </div>
+            <div class="modal-body">
+                <div id="mount-here">
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="mdl-button mdl-js-button" data-dismiss="modal">Close</button>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+
+<script>
+
+
+    var currentUser;
+    var pointerUser;
+
+    Parse.User.become("<%= token %>").then(function(user){
+
+        pointerUser = user;
+
+        user.fetch().then(function(fullUser){
+
+            currentUser = fullUser;
+
+        });
+
+
+
+
+    });
+
+
+    var sub_request_object;
+
+
+
+
+
+    $('.accept').on("click",function(ev){
+
+        var id = $(this).attr('objectId');
+
+        $('#select-group-modal').modal('show');
+
+        $('#mount-here').html('<div class="mdl-spinner mdl-js-spinner is-active"></div>');
+        componentHandler.upgradeDom();
+
+        var sub_requests = new Parse.Query(Parse.Object.extend("sub_requests"));
+        sub_requests.equalTo("objectId",id);
+        sub_requests.include("sub_by");
+
+        sub_requests.find({
+            success: function(abc){
+
+                sub_request_object = abc[0];
+
+                $('#mount-here').empty();
+                $('#mount-here').html('<div>Name: ' + abc[0].get("sub_by").attributes.first_name + '</div><div>Branch: ' + abc[0].get("sub_by").attributes.branch + '</div><div>SID: ' + abc[0].get("sub_by").attributes.sid + '</div>');
+
+                var groups = currentUser.get("groups");
+
+                console.log('groups: ' + groups);
+
+                if(groups.length == 0)
+                {
+                    // Not allowed to accept a student since no group is present
+
+                }
+                else
+                {
+
+
+
+
+
+                    var selectBox = '<select id="group-selector"> ';
+
+                    for(var i = 0 ; i < groups.length; ++i)
+                    {
+                        selectBox += '<option value="' + groups[i] + '">' + groups[i] + '</option>';
+                    }
+                    selectBox += '</select>';
+
+                    $('#mount-here').append(selectBox);
+
+                    $('#mount-here').append('<button id="acceptor" onclick="acceptNow()" class="mdl-button mdl-js-button mdl-button--accent mdl-js--ripple-effect">Add to this Group</button>')
+                    componentHandler.upgradeDom();
+
+
+
+                }
+
+
+
+
+
+            },
+            error: function(u,e){
+                console.log("error: " + e.message);
+            }
+        })
+
+
+
+    });
+
+    $('.reject').on("click",function(ev){
+
+        var id = $(this).attr('objectId');
+
+        var sub_requests = new Parse.Query(Parse.Object.extend("sub_requests"));
+        sub_requests.equalTo("objectId",id);
+
+        sub_requests.find({
+            success: function(abc){
+
+                abc[0].destroy({
+                    success:function(){
+                        window.location.reload();
+                    }
+
+                });
+            },
+            error: function(u,e){
+                console.log("error: " + e.message);
+            }
+        });
+
+
+
+
+
+    });
+
+
+    function acceptNow(){
+
+        var groupVal = $('#group-selector').val();
+
+        $('#acceptor').remove();
+        $('#mount-here').append('<div class="mdl-spinner mdl-js-spinner is-active"></div>')
+
+        var subscriptions = Parse.Object.extend("subscriptions");
+        var Subs = new subscriptions();
+
+        Subs.set("sub_by",sub_request_object.get("sub_by"));
+        Subs.set("sub_to",sub_request_object.get("sub_to"));
+        Subs.set("groupName",groupVal);
+
+        Subs.save({
+
+            success:function(){
+
+                sub_request_object.destroy({
+                    success:function(){
+
+                        window.location.reload();
+
+                    }
+                });
+
+            }
+
+        });
+
+
+
+
+    }
+
+
+
+
+</script>
+
+
+</body>
+</html>

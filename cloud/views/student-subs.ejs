@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home - Balloon</title>
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/bootstrap-modals/bootstrap.css"/>
+    <script src="/bootstrap-modals/bootstrap.js"></script>
+
+    <link rel="stylesheet" href="/css/config.css"/>
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <link rel="stylesheet" href="/css/mdl-dash.css"/>
+
+
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+    <script type="text/javascript">
+        Parse.initialize("XH75pcgt3aNDaWpZZO8auvda5aAmq9vfqFHgj0Et", "RetUyiG1raywkGL40dISTg6KK6ECJXdzy9iBGMS9");
+    </script>
+
+</head>
+<body style="overflow-y: scroll">
+
+<!-- Always shows a header, even in smaller screens. -->
+
+<% include templates/student-header.ejs %>
+            <!-- Your content goes here -->
+
+
+            <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                <div class="mdl-tabs__tab-bar">
+                    <a href="#active-panel" class="mdl-tabs__tab is-active"><span class="mdl-badge" data-badge=<%= sub_data.length %> >Active</span></a>
+                    <a href="#pending-panel" class="mdl-tabs__tab"><span class="mdl-badge" data-badge=<%= pending_data.length %> >Pending</span></a>
+                    <a href="#new-panel" class="mdl-tabs__tab"><span class="mdl-badge" data-badge=<%= new_data.length %> >Add New</span></a>
+                </div>
+
+                <div class="mdl-tabs__panel is-active" id="active-panel">
+                    <% if(sub_data.length != 0 ){ %>
+
+                    <table class="mdl-data-table mdl-js-data-table">
+                        <thead>
+                        <tr>
+                            <th>Subscribed To</th>
+                            <th>Subscribed On</th>
+                            <td></td>
+                        </tr>
+
+                        </thead>
+                        <tbody>
+
+                        <% for(var i = 0 ; i < sub_data.length; ++i){ %>
+
+                        <tr>
+                            <td><%= sub_data[i].get("sub_to").attributes.first_name %> <%= sub_data[i].get("sub_to").attributes.last_name %></td>
+                            <td><%= sub_data[i].get("createdAt") %></td>
+                            <td><button id="<%= sub_data[i].id %>" class="mdl-button mdl-js-button mdl-button--accent unsubscribe">Unsubscribe</button></td>
+
+                        </tr>
+
+                        <% } %>
+
+                        </tbody>
+                    </table>
+                    <% } else { %>
+                    <h2>No active subscriptions</h2>
+
+                    <% } %>
+                </div>
+                <div class="mdl-tabs__panel" id="pending-panel">
+                    <table class="mdl-data-table mdl-js-data-table">
+                        <thead>
+                            <td>Request Sent to</td>
+                            <td>Sent on (UTC)</td>
+                        </thead>
+                        <tbody>
+
+                        <% for (var i = 0; i < pending_data.length; ++i){%>
+
+                        <td><%= pending_data[i].get("sub_to").attributes.first_name %><%= pending_data[i].get("sub_to").attributes.last_name %></td>
+                        <td><%= pending_data[i].get("createdAt") %></td>
+                        <td id="cancel-handler"><button id="cancel_now" sub_id="<%= pending_data[i].id %>" class="mdl-button mdl-js-button mdl-button--accent">Cancel Request</button></td>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mdl-tabs__panel" id="new-panel">
+
+                    <table class="mdl-data-table mdl-js-data-table">
+                        <thead>
+                            <tr>
+
+                                <td>Name</td>
+                                <td>Department</td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <% for (var i = 0; i < new_data.length; ++i) { %>
+
+                        <td id="<%= i %>name"><%= new_data[i].get("isTeacher").attributes.first_name %>  <%= new_data[i].get("isTeacher").attributes.last_name %></td>
+                        <td id="<%= i %>dept"><%= new_data[i].get("isTeacher").attributes.department %></td>
+                        <td><button objectId="<%= new_data[i].get("isTeacher").id %>" id="<%= i %>" class="mdl-button mdl-js-button mdl-button--accent teacher-update"><i class="material-icons">settings_applications</i></button>
+                            </td>
+                        <% } %>
+
+
+
+                        </tbody>
+                    </table>
+
+
+
+
+                </div>
+            </div>
+
+
+<% include templates/student-footer.ejs %>
+
+<!-- TODO: Bootstrap Modal -->
+
+<div class="modal fade" id="update-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Settings</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div id="name"></div>
+                    <div id="department"></div>
+                    <div id="status"></div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="mdl-button mdl-js-button" data-dismiss="modal">Close</button>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+<script>
+
+    function masterfunc(){
+
+    var myid;
+    var objectId;
+    var currentUser;
+
+
+    Parse.User.become("<%= token.getSessionToken() %>").then(function(user){
+
+
+        user.fetch().then(function(fullUser){
+
+            currentUser = fullUser;
+
+        });
+
+
+
+
+    });
+
+
+
+    $('.teacher-update').on('click',function(ev){
+
+        myid = $(this).attr('id');
+
+        var teacherName = document.getElementById(myid + 'name').innerHTML;
+        var deptName = document.getElementById(myid + 'dept').innerHTML;
+
+        $('#name').text(teacherName);
+        $('#department').text(deptName);
+
+
+        $('#update-modal').modal('show');
+
+
+    });
+
+    $('#update-modal').on('shown.bs.modal',function(event){
+
+        $('#status').append('<div id="loader-1" class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>');
+        componentHandler.upgradeDom();
+
+        objectId = $('#' + myid).attr('objectId');
+
+
+
+        var teacher = Parse.Object.extend("teacher");
+        var teacherQuery = new Parse.Query(teacher);
+        teacherQuery.equalTo('objectId',objectId);
+
+        teacherQuery.find({
+            success: function(u){
+
+                var subs = Parse.Object.extend("subscriptions");
+                var subsquery = new Parse.Query(subs);
+
+                subsquery.equalTo("sub_by",currentUser.get("isStudent"));
+                subsquery.equalTo("sub_to",u[0]);
+
+                subsquery.find({
+                    success: function(v){
+                        if(v.length == 0)
+                        {
+                            var pending = Parse.Object.extend("sub_requests");
+                            var pendingQuery = new Parse.Query(pending);
+
+                            pendingQuery.equalTo("sub_by",currentUser.get("isStudent"));
+                            pendingQuery.equalTo("sub_to",u[0]);
+
+                            pendingQuery.find({
+                                success: function(w){
+                                    if(w.length == 0)
+                                    {
+                                        // Request is not sent earlier
+                                        $('#loader-1').remove();
+                                        $('#status').append('<button id="sub_now" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Subscribe</button>');
+                                        componentHandler.upgradeDom();
+                                        RegisterEvents(u[0]);
+                                    }
+                                    else
+                                    {
+                                        // Request is earlier sent
+                                        $('#loader-1').remove();
+                                        $('#status').append('<div>Request already sent</div>');
+                                        componentHandler.upgradeDom();
+                                        RegisterEvents(u[0]);
+
+
+                                    }
+                                }
+                            });
+
+
+
+
+                        }
+                        else
+                        {
+                            $('#loader-1').remove();
+                            $('#status').append('<button id="unsub_now" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Already Subscribed</button><br/><div>Use the active subscriptions panel to unsubscribe</div>');
+                            componentHandler.upgradeDom();
+                            RegisterEvents(u[0]);
+                        }
+                    }
+                });
+
+            }
+        });
+
+
+
+    });
+
+    $('#update-modal').on("hidden.bs.modal",function(event){
+
+        $('#sub_now').remove();
+        $('#unsub_now').remove();
+        $('#cancel_now').remove();
+        $('#status').empty();
+
+
+    });
+
+        $('#cancel_now').on("click",function(ev){
+
+            var sub_id = $(this).attr('sub_id');
+            var areUSure = confirm("Do you really want to cancel your request? There is no undo.");
+            if(areUSure)
+            {
+                // Delete the subscription request
+                $(this).remove();
+                $('#cancel-handler').html('<div class="mdl-spinner mdl-js-spinner is-active"></div>');
+                componentHandler.upgradeDom();
+                var sub_req = new Parse.Query(Parse.Object.extend("sub_requests"));
+                sub_req.equalTo('objectId',sub_id);
+                sub_req.find({
+                    success:function(abc){
+                        abc[0].destroy({
+                            success: function(){
+                                $('#cancel-handler').empty();
+                                window.location.reload();
+                            }
+                        });
+                    }
+                });
+            }
+
+
+
+
+
+
+        });
+
+
+
+    function RegisterEvents(teacherObj){
+
+        $('#sub_now').on("click",function(event){
+
+
+
+            var NewRequest = Parse.Object.extend("sub_requests");
+            var newRequest = new NewRequest();
+
+            var userQuery = new Parse.Query(Parse.User);
+
+            userQuery.equalTo("objectId",currentUser.id);
+            userQuery.include("isStudent");
+
+            userQuery.find({
+                success: function(userObject){
+
+                    newRequest.set("sub_by",userObject[0].get("isStudent"));
+                    newRequest.set("sub_to",teacherObj);
+
+                    newRequest.save({
+                        success:function(){
+                            $('#sub_now').remove();
+                            $('#status').text("Request sent successfully");
+                        },
+                        error: function(us,err){
+                            console.log("error: " + err.code + err.message);
+                        }
+                    });
+
+                }
+            });
+
+
+
+
+
+        });
+
+        $('#unsub_now').on("click",function(ev){
+
+        });
+
+
+
+    }
+
+    }
+    masterfunc();
+
+    $('.unsubscribe').on("click",function(ev){
+
+        var id = $(this).attr('id');
+
+        var areYouSure = confirm('Are you sure you want to unsubscribe? There is no undo');
+        if (areYouSure)
+        {
+            $('#' + id).replaceWith('<div class="mdl-spinner mdl-js-spinner is-active"></div>');
+            componentHandler.upgradeDom();
+            var subscriptions = new Parse.Query(Parse.Object.extend("subscriptions"));
+            subscriptions.equalTo('objectId',id);
+            subscriptions.find({
+                success: function(abc){
+
+                    abc[0].destroy({
+                        success:function(){
+                            window.location.reload();
+                        }
+                    });
+
+                }
+            });
+
+        }
+
+
+
+
+
+    });
+
+
+</script>
+
+</body>
+</html>

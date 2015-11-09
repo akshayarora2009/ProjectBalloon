@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "NextUp - WebAdmin": {
+      "applicationId": "XH75pcgt3aNDaWpZZO8auvda5aAmq9vfqFHgj0Et"
+    },
+    "_default": {
+      "link": "NextUp - WebAdmin"
+    }
+  }
+}

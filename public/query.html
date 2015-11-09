@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+    <script type="text/javascript">
+        Parse.initialize("XH75pcgt3aNDaWpZZO8auvda5aAmq9vfqFHgj0Et", "RetUyiG1raywkGL40dISTg6KK6ECJXdzy9iBGMS9");
+    </script>
+</head>
+<body>
+<h4>hello</h4>
+
+<script>
+    function sample(){
+    var query = new Parse.Query(Parse.User);
+    query.notEqualTo("isTeacher", null).include("isTeacher");  // find all the women
+    query.find({
+        success: function(women) {
+            // Do stuff
+            console.log(women[0]);
+        }
+    });
+    }
+
+    sample();
+</script>
+
+
+
+</body>
+</html>

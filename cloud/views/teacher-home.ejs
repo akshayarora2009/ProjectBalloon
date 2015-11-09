@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home - Balloon</title>
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/css/config.css"/>
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <link rel="stylesheet" href="/css/mdl-dash.css"/>
+
+
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+    <script type="text/javascript">
+        Parse.initialize("XH75pcgt3aNDaWpZZO8auvda5aAmq9vfqFHgj0Et", "RetUyiG1raywkGL40dISTg6KK6ECJXdzy9iBGMS9");
+    </script>
+
+</head>
+<body style="overflow-y: scroll">
+
+<!-- Always shows a header, even in smaller screens. -->
+
+<% include templates/teacher-header.ejs %>
+            <!-- My content goes here -->
+
+<div class="mdl-grid">
+
+    <div class="mdl-cell mdl-cell--2-col"></div>
+
+    <div class="mdl-cell mdl-cell--8-col">
+
+        <div id="page-message"><%= message %></div>
+
+    <form method="post" action="/sendmail" onsubmit="return checkMail();">
+
+        <select name="groupName" id="groupName" onchange="countRecipients();" required>
+
+            <option value="" default selected>Select a group</option>
+            <% for(var i = 0; i < fullUser.get("groups").length; ++i){ %>
+                <option value="<%= fullUser.get("groups")[i] %>"><%= fullUser.get("groups")[i] %></option>
+            <% } %>
+        </select>
+
+        <br/>
+        <br/>
+        <div id="recipient-count"></div>
+
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:100%">
+            <input class="mdl-textfield__input" name="subject" type="text" id="subject">
+            <label class="mdl-textfield__label" for="subject">Subject</label>
+        </div>
+        <br/>
+
+        <div class="mdl-textfield mdl-js-textfield" style="width:100%">
+            <textarea class="mdl-textfield__input" name="mailbody" type="text" rows= "3" id="mailbody" ></textarea>
+            <label class="mdl-textfield__label" for="mailbody">Enter your message here..</label>
+        </div>
+
+        <br/>
+
+        <input style="width:100%" type="submit" value="Send Mail" class="mdl-button mdl-js-button mdl-button--accent"/>
+    </form>
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<% include templates/teacher-footer.ejs %>
+
+
+
+<script>
+
+    var countHistory = [];
+    var recentCount;
+
+    function checkMail(){
+
+        var mailbody = $('#mailbody').val();
+        var subject = $('#subject').val();
+
+        if(mailbody.length == 0){
+            $('#recipient-count').append('<div>Cannot send a mail with no content</div>');
+            return false;
+        }
+
+        if(subject.length == 0){
+            var areYouSure = confirm("Send mail without any subject?");
+            if(areYouSure)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+    if(recentCount <= 0)
+    {
+        $('#recipient-count').append('<div>Cannot Send mail to zero recipients</div>');
+        return false;
+
+    }
+        return true;
+
+    }
+
+
+
+
+    function countRecipients(){
+
+        $('#recipient-count').html('<div class="mdl-spinner mdl-js-spinner is-active"></div>');
+        componentHandler.upgradeDom();
+
+        console.log('called');
+
+        var groupName = $('#groupName').val();
+        console.log('group name: ' + groupName);
+
+        if(countHistory[groupName])
+        {
+            // A count already exists..
+            $('#recipient-count').empty();
+            $('#recipient-count').text(countHistory[groupName] + ' recipient(s)');
+            recentCount = countHistory[groupName];
+
+        }
+        else
+        {
+            var subQuery = new Parse.Query(Parse.Object.extend("subscriptions"));
+            subQuery.equalTo("groupName",groupName);
+
+
+            subQuery.find({
+                success:function(abc){
+
+                    countHistory[groupName] = abc.length;
+                    recentCount = abc.length;
+                    $('#recipient-count').empty().text(countHistory[groupName] + ' recipient(s)');
+
+                }
+            });
+        }
+
+
+
+
+
+
+    }
+
+
+</script>
+
+</body>
+</html>

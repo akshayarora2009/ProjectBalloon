@@ -1,0 +1,32 @@
+.make-block{
+    display:block;
+    width:100%
+}
+
+.table-input-div{
+    padding:0;
+    margin:0
+}
+
+#save-table {
+    position: fixed;
+    display: block;
+    right: 0px;
+    bottom: 0px;
+    margin-right: 40px;
+    margin-bottom: 40px;
+    z-index: 900;
+}
+
+#my-doc{
+
+background: rgba(73,155,234,1);
+background: -moz-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(23,172,198,1) 100%);
+background: -webkit-gradient(left top, right top, color-stop(0%, rgba(73,155,234,1)), color-stop(100%, rgba(23,172,198,1)));
+background: -webkit-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(23,172,198,1) 100%);
+background: -o-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(23,172,198,1) 100%);
+background: -ms-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(23,172,198,1) 100%);
+background: linear-gradient(to right, rgba(73,155,234,1) 0%, rgba(23,172,198,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea', endColorstr='#17acc6', GradientType=1 );
+
+}

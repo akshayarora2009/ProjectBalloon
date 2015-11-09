@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NextUp - WebAdmin</title>
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/css/config.css"/>
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <link rel="stylesheet" href="/css/mdl-dash.css"/>
+
+
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+    <script type="text/javascript">
+        Parse.initialize("XH75pcgt3aNDaWpZZO8auvda5aAmq9vfqFHgj0Et", "RetUyiG1raywkGL40dISTg6KK6ECJXdzy9iBGMS9");
+    </script>
+    <script type="text/javascript" charset="utf8" src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+
+</head>
+<body style="overflow-y: scroll">
+
+<!-- Always shows a header, even in smaller screens. -->
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+    <header class="demo-header mdl-layout__header mdl-color--white mdl-color--grey-100 mdl-color-text--grey-600">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">Home</span>
+            <div class="mdl-layout-spacer"></div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+                <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+                    <i class="material-icons">search</i>
+                </label>
+                <div class="mdl-textfield__expandable-holder">
+                    <input class="mdl-textfield__input" type="text" id="search">
+                    <label class="mdl-textfield__label" for="search">Enter your query...</label>
+                </div>
+            </div>
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+                <i class="material-icons">more_vert</i>
+            </button>
+            <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+                <li class="mdl-menu__item">About</li>
+                <li class="mdl-menu__item">Contact</li>
+                <li class="mdl-menu__item">Legal information</li>
+            </ul>
+        </div>
+    </header>
+    <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+        <header class="demo-drawer-header">
+            <img src="images/user.jpg" class="demo-avatar">
+            <div class="demo-avatar-dropdown">
+                <span>hello@example.com</span>
+                <div class="mdl-layout-spacer"></div>
+                <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+                    <i class="material-icons" role="presentation">arrow_drop_down</i>
+                    <span class="visuallyhidden">Accounts</span>
+                </button>
+                <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
+                    <li class="mdl-menu__item">hello@example.com</li>
+                    <li class="mdl-menu__item">Log Out</li>
+
+                </ul>
+            </div>
+        </header>
+        <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+            <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+            <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Inbox</a>
+            <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
+            <div class="mdl-layout-spacer"></div>
+            <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i><span class="visuallyhidden">Help</span></a>
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <!-- Your content goes here -->
+            <div id="table-contents" style="overflow:auto"></div>
+
+            <div class="mdl-grid" id="select-branch-year">
+                <div class="mdl-cell mdl-cell--2-col">
+                </div>
+                <div class="mdl-cell mdl-cell--4-col">
+
+                    <div id="insert-here"></div>
+
+                    <!-- <input id="show-button" type="button" value="Show table"/> -->
+                </div>
+
+            </div>
+            <button style="display:none" id="save-table" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">Save</button>
+
+
+            <!--
+            <form id='insert-here'>
+
+                <select id="select-year">
+                    <option value="1">I</option>
+                    <option value="2">II</option>
+                    <option value="3">III</option>
+                    <option value="4">IV</option>
+                </select>
+                <label for="select-year">Select Year</label>
+
+            </form>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+    </main>
+
+    <script>
+
+
+
+
+
+
+
+        var isBranchSelected = false;
+        var isButtonRendered = false;
+
+
+        var onSelect = function() {
+            this.button.innerHTML = this.innerHTML;
+
+            if(this.button.id == 0)
+            {
+                // the year button
+                var yearDet = this.innerHTML.substring(0,1);
+                $('#' + this.button.id).attr('yearDet',yearDet);
+
+            }
+            else if(this.button.id == 1)
+            {
+                var branchDet = this.innerHTML.substring(0,3);
+                $('#1').attr('branchDet',branchDet);
+            }
+
+
+
+
+
+
+            if(isBranchSelected === false)
+            {
+                isBranchSelected = true;
+                var branch;
+
+                if(this.innerHTML.substring(0,1) == 4)
+                {
+                    branch = ["AERO", "CIVIL", "CSE", "ECE","ELECTRICAL", "INFORMATION TECH","MECHANICAL", "METALLURGY", "PRODUCTION"];
+                }
+                else
+                {
+                    branch = ["AERO", "CIVIL", "CSE", "ECE","ELECTRICAL", "MECHANICAL", "METALLURGY", "PRODUCTION"];
+                }
+
+
+                makeDropdown(branch,"Select the branch");
+
+                componentHandler.upgradeDom();
+
+            }
+
+            if(isBranchSelected === true && this.button.id == 1 && isButtonRendered == false)
+            {
+                // Branch is selected, now render the submit button
+
+                var mountPoint = document.getElementById('insert-here');
+                var button = document.createElement('input');
+                button.setAttribute('type','submit');
+                button.setAttribute('value','Proceed');
+                button.setAttribute('class','mdl-button mdl-js-button');
+                button.setAttribute('id','show-button');
+                mountPoint.appendChild(button);
+
+                componentHandler.upgradeDom();
+                attachShowButtonHandler();
+
+                isButtonRendered = true;
+
+
+            }
+
+
+
+
+
+
+        }
+
+        var insertPoint = 'insert-here';
+        var numberOfDropdowns = 0;
+
+        function makeDropdown(options,name) {
+
+
+            // create the button
+            var container = document.createElement('div');
+
+            var button = document.createElement('BUTTON');
+            button.id = numberOfDropdowns; // this is how Material Design associates option/button
+            button.setAttribute('class', 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent');
+            button.innerHTML = name;
+
+            container.appendChild(button);
+            document.getElementById(insertPoint).appendChild(container);
+
+            // add the options to the button (unordered list)
+            var ul = document.createElement('UL');
+            ul.setAttribute('class', 'mdl-menu mdl-js-menu mdl-js-ripple-effect');
+            ul.setAttribute('for', numberOfDropdowns); // associate button
+            for (var index in options) {
+                // add each item to the list
+                var li = document.createElement('LI');
+                li.setAttribute('class', 'mdl-menu__item');
+                li.innerHTML = options[index];
+                li.button = button;
+                li.onclick = onSelect;
+                ul.appendChild(li);
+            }
+            container.appendChild(ul);
+            // and finally add the list to the HTML
+            numberOfDropdowns++;
+        }
+
+        var year = ["1", "2", "3", "4"];
+        makeDropdown(year,"Select the year");
+
+
+
+    </script>
+    <!-- <script src="/js/app.js"></script> -->
+    <script src="/js/handle-table.js"></script>
+
+
+
+
+
+</div>
+
+</body>
+</html>
